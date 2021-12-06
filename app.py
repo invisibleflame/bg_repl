@@ -16,6 +16,7 @@ from gevent.pywsgi import WSGIServer
 
 from flask_ngrok import run_with_ngrok
 app = Flask(__name__)
+run_with_ngrok(app) 
 
 def background_replace(args):
     if not osp.exists(args.save_dir):
