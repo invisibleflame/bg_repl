@@ -33,9 +33,9 @@
 
     {% if filename %}
     <div>
-        <img src="{{filename}}">
+        <img src="{{url_for('static', filename='output/'+filename)}}">
     </div>
-    <a href="{{filename}}" download><button>Download</button></a>
+    <a href="{{url_for('static', filename='output/'+filename)}}" download><button>Download</button></a>
     {% endif %}
    
 

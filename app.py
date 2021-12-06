@@ -14,18 +14,17 @@ from flask import Flask, redirect, url_for, request, render_template
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
 
-# Define a flask app
+from flask_ngrok import run_with_ngrok
 app = Flask(__name__)
 
 def background_replace(args):
-    
     if not osp.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
     if args.img_path is not None:
         img = cv2.imread(args.img_path)
         bg = get_bg_img(args.bg_img_path, img.shape)
-        args.input_shape = img.shape
+        args.input_shape = (img.shape[0],img.shape[1])
         predictor = Predictor(args)
         comb = predictor.run(img, bg)
         save_name = osp.basename(args.img_path)
@@ -61,30 +60,26 @@ def index():
 def predict():
     if request.method == 'POST':
         # Get the file from post request
+        args = input_arguments()
         f = request.files['file']
         basepath = os.path.dirname(__file__)
-        args.save_dir = os.path.join(basepath, 'output')
+        args.save_dir = os.path.join(basepath, 'static/output')
         shutil.rmtree(args.save_dir)
         os.mkdir(args.save_dir)
-        file_path = os.path.join(
-            basepath, 'uploads', secure_filename(f.filename))
+        file_path = os.path.join(basepath, 'uploads', secure_filename(f.filename))
         f.save(file_path)
         f1 = request.files['file2']
-        file_path1 = os.path.join(
-            basepath, 'uploads', secure_filename(f1filename))
+        file_path1 = os.path.join(basepath, 'uploads', secure_filename(f1.filename))
         f1.save(file_path1)
-
-        args = input_arguments()
         args.img_path = file_path
         args.bg_img_path = file_path1
-        
         pth = background_replace(args)
         os.remove(args.img_path)
         os.remove(args.bg_img_path)
-        return render_template('index.html',filename = pth)
+        return render_template('index.html',filename = osp.basename(file_path))
     else:
         return render_template('index.html')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
