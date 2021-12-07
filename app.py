@@ -19,6 +19,7 @@ app = Flask(__name__)
 run_with_ngrok(app) 
 
 def background_replace(args):
+    print(7)
     if not osp.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
